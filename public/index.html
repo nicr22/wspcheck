@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WspCheck — Verificador WhatsApp</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app">
+    <header>
+      <h1>
+        <span class="logo">📱</span>
+        WspCheck
+      </h1>
+      <p class="subtitle">Verificador de números WhatsApp</p>
+    </header>
+
+    <!-- ── ESTADO DE CONEXIÓN ── -->
+    <section class="card" id="seccion-estado">
+      <h2>Conexión WhatsApp</h2>
+
+      <div id="estado-badge" class="badge badge-connecting">
+        <span class="dot"></span>
+        <span id="estado-texto">Conectando...</span>
+      </div>
+
+      <div id="qr-container" hidden>
+        <p class="qr-instrucciones">Abre WhatsApp → <strong>Dispositivos vinculados</strong> → Escanea este QR</p>
+        <img id="qr-img" src="" alt="QR WhatsApp" />
+      </div>
+
+      <div id="info-conectado" hidden>
+        <p class="telefono-info">Conectado como <strong id="telefono-num"></strong></p>
+      </div>
+    </section>
+
+    <!-- ── TABS ── -->
+    <div class="tabs">
+      <button class="tab active" data-tab="individual">Verificar número</button>
+      <button class="tab" data-tab="pegar">Pegar números</button>
+      <button class="tab" data-tab="archivo">Subir CSV/Excel</button>
+    </div>
+
+    <!-- ── VERIFICAR INDIVIDUAL ── -->
+    <section class="card tab-content active" id="tab-individual">
+      <h2>Verificar número individual</h2>
+      <p class="hint">Ingresa el número con código de país, sin espacios ni símbolos.</p>
+      <div class="form-row">
+        <input
+          type="text"
+          id="input-numero"
+          placeholder="+51987654321"
+          maxlength="20"
+        />
+        <button id="btn-verificar-uno" class="btn-primary">Verificar</button>
+      </div>
+      <div id="resultado-uno" class="resultado" hidden></div>
+    </section>
+
+    <!-- ── PEGAR NÚMEROS ── -->
+    <section class="card tab-content" id="tab-pegar" hidden>
+      <h2>Pegar y verificar números</h2>
+      <p class="hint">Pega números separados por comas, punto y coma, o uno por línea. Se deduplicarán automáticamente.</p>
+      <textarea
+        id="textarea-numeros"
+        placeholder="+51987654321&#10;+5215551234567&#10;+34612345678"
+        rows="6"
+      ></textarea>
+      <div class="form-actions">
+        <span id="conteo-numeros" class="conteo">0 números detectados</span>
+        <button id="btn-verificar-texto" class="btn-primary">Verificar todos</button>
+      </div>
+
+      <!-- Progreso bulk (compartido con archivo) -->
+      <div id="progreso-texto" class="progreso-container" hidden>
+        <div class="progreso-header">
+          <span id="progreso-texto-label">Iniciando...</span>
+          <span id="progreso-texto-pct">0%</span>
+        </div>
+        <div class="barra-fondo">
+          <div class="barra-relleno" id="barra-texto"></div>
+        </div>
+        <div class="resumen-cards" id="resumen-texto" hidden>
+          <div class="resumen-card green">
+            <span class="resumen-num" id="texto-con-wa">0</span>
+            <span>Con WhatsApp</span>
+          </div>
+          <div class="resumen-card red">
+            <span class="resumen-num" id="texto-sin-wa">0</span>
+            <span>Sin WhatsApp</span>
+          </div>
+          <div class="resumen-card gray">
+            <span class="resumen-num" id="texto-total">0</span>
+            <span>Total</span>
+          </div>
+        </div>
+        <div class="download-buttons" id="descarga-texto" hidden>
+          <button class="btn-download green" onclick="descargar('con-wa')">⬇ Descargar con WhatsApp</button>
+          <button class="btn-download red" onclick="descargar('sin-wa')">⬇ Descargar sin WhatsApp</button>
+          <button class="btn-download gray" onclick="descargar('todos')">⬇ Descargar todos</button>
+        </div>
+      </div>
+
+      <div id="tabla-texto-container" class="tabla-container" hidden>
+        <table id="tabla-texto">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Número</th>
+              <th>WhatsApp</th>
+            </tr>
+          </thead>
+          <tbody id="tabla-texto-body"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ── SUBIR ARCHIVO ── -->
+    <section class="card tab-content" id="tab-archivo" hidden>
+      <h2>Verificar desde CSV o Excel</h2>
+      <p class="hint">Se detecta automáticamente la columna con números de teléfono.</p>
+
+      <div class="dropzone" id="dropzone">
+        <div class="dropzone-inner">
+          <span class="dropzone-icon">📂</span>
+          <p>Arrastra tu archivo aquí o <label for="input-archivo" class="link">selecciona uno</label></p>
+          <p class="dropzone-hint">CSV, XLS, XLSX — máx 10 MB</p>
+        </div>
+        <input type="file" id="input-archivo" accept=".csv,.xls,.xlsx" hidden />
+      </div>
+
+      <div id="archivo-info" class="archivo-info" hidden>
+        <span id="archivo-nombre"></span>
+        <button id="btn-cambiar-archivo" class="btn-ghost">Cambiar</button>
+      </div>
+
+      <div class="form-actions">
+        <button id="btn-verificar-bulk" class="btn-primary" disabled>Verificar archivo</button>
+      </div>
+
+      <div id="progreso-bulk" class="progreso-container" hidden>
+        <div class="progreso-header">
+          <span id="progreso-bulk-label">Iniciando...</span>
+          <span id="progreso-bulk-pct">0%</span>
+        </div>
+        <div class="barra-fondo">
+          <div class="barra-relleno" id="barra-bulk"></div>
+        </div>
+        <div class="resumen-cards" id="resumen-bulk" hidden>
+          <div class="resumen-card green">
+            <span class="resumen-num" id="bulk-con-wa">0</span>
+            <span>Con WhatsApp</span>
+          </div>
+          <div class="resumen-card red">
+            <span class="resumen-num" id="bulk-sin-wa">0</span>
+            <span>Sin WhatsApp</span>
+          </div>
+          <div class="resumen-card gray">
+            <span class="resumen-num" id="bulk-total">0</span>
+            <span>Total</span>
+          </div>
+        </div>
+        <div class="download-buttons" id="descarga-bulk" hidden>
+          <button class="btn-download green" onclick="descargar('con-wa')">⬇ Descargar con WhatsApp</button>
+          <button class="btn-download red" onclick="descargar('sin-wa')">⬇ Descargar sin WhatsApp</button>
+          <button class="btn-download gray" onclick="descargar('todos')">⬇ Descargar todos</button>
+        </div>
+      </div>
+
+      <div id="tabla-bulk-container" class="tabla-container" hidden>
+        <table id="tabla-bulk">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Número</th>
+              <th>WhatsApp</th>
+            </tr>
+          </thead>
+          <tbody id="tabla-bulk-body"></tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  <footer>
+    <span>Creado por <a href="https://niltoncuellar.com" target="_blank" rel="noopener"><strong>N1CR</strong></a></span>
+    <span class="sep">·</span>
+    <span>Todos los derechos reservados &copy; 2026</span>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
