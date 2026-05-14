@@ -102,4 +102,20 @@ function getStatus() {
   }
 }
 
-module.exports = { initWhatsApp, verificarNumero, getStatus }
+async function desconectar() {
+  try {
+    if (sock) {
+      sock.ev.removeAllListeners()
+      await sock.logout()
+    }
+  } catch {}
+  sock = null
+  connectionState = 'disconnected'
+  latestQR = null
+  connectedPhone = null
+  limpiarSesion()
+  console.log('[WA] Sesión cerrada manualmente. Generando QR nuevo...')
+  setTimeout(() => initWhatsApp(), 1500)
+}
+
+module.exports = { initWhatsApp, verificarNumero, getStatus, desconectar }

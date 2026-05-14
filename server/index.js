@@ -14,6 +14,7 @@ app.use('/', require('./routes/verificarUno'))
 app.use('/', require('./routes/verificarBulk'))
 app.use('/', require('./routes/verificarTexto'))
 app.use('/', require('./routes/descargar'))
+app.use('/', require('./routes/desconectar'))
 
 app.listen(PORT, () => {
   console.log(`\n🚀 WspCheck corriendo en http://localhost:${PORT}\n`)

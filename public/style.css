@@ -114,6 +114,25 @@ header h1 {
 .telefono-info { color: var(--text-muted); font-size: 14px; }
 .telefono-info strong { color: var(--green); }
 
+.conectado-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.btn-danger {
+  background: var(--red-bg);
+  border: 1px solid rgba(242,95,92,.3);
+  color: var(--red);
+  border-radius: var(--radius-sm);
+  padding: 7px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+.btn-danger:hover { opacity: 0.75; }
+
 /* ── TABS ── */
 .tabs {
   display: flex;

@@ -56,6 +56,15 @@ async function pollEstado() {
 pollEstado()
 setInterval(pollEstado, 3000)
 
+/* ── DESCONECTAR ── */
+document.getElementById('btn-desconectar').addEventListener('click', async () => {
+  if (!confirm('¿Desconectar esta cuenta? Se mostrará un QR nuevo para vincular otra.')) return
+  await fetch('/desconectar', { method: 'POST' })
+  infoConectado.hidden = true
+  estadoBadge.className = 'badge badge-connecting'
+  estadoTexto.textContent = 'Conectando...'
+})
+
 /* ── VERIFICAR INDIVIDUAL ── */
 const inputNumero = document.getElementById('input-numero')
 const btnUno = document.getElementById('btn-verificar-uno')
