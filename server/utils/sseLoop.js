@@ -3,7 +3,7 @@ const fs = require('fs')
 const path = require('path')
 const { verificarNumero } = require('../whatsapp')
 
-const DELAY_MS = 1500
+const DELAY_MS = 2000
 const RESULTS_FILE = path.join(__dirname, '..', '..', 'results', 'last_result.csv')
 
 function sleep(ms) {
